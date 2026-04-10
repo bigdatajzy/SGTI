@@ -6,39 +6,77 @@
     <title>水果 TI — 你是什么水果</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body>
+  <body class="intro-mode">
     <div class="wrap">
       <header class="hero" id="view-intro">
-        <p class="eyebrow">Fruit TI</p>
-        <h1>水果 TI</h1>
-        <p class="lede">MBTI 已经过时，水果 TI 来了。</p>
-        <p class="sub">
-          全选完才会放行。世界已经够乱了，起码把题做完整。
-        </p>
-        <button type="button" class="btn primary" id="btn-start">开始测试</button>
+        <div class="hero-card">
+          <div class="hero-visual" aria-hidden="true">
+            <span class="hero-emoji">🍉</span>
+            <span class="hero-emoji">🍋</span>
+            <span class="hero-emoji">🍇</span>
+            <span class="hero-emoji">🥥</span>
+          </div>
+          <p class="eyebrow">Fruit TI · 娱乐向</p>
+          <h1><span class="hero-title-cn">水果</span> <span class="hero-title-en">TI</span></h1>
+          <p class="lede">
+            <span class="lede-muted">MBTI 已经过时，</span><span class="lede-accent">水果 TI</span><span class="lede-muted">来了。</span>
+          </p>
+          <p class="sub">
+            全选完才会放行。世界已经够乱了，起码把题做完整。
+          </p>
+          <ul class="hero-meta">
+            <li><span class="hero-meta-k">题量</span> 16 题</li>
+            <li><span class="hero-meta-k">形式</span> 单页单选</li>
+            <li><span class="hero-meta-k">耗时</span> 约 3 分钟</li>
+            <li><span class="hero-meta-k">彩蛋</span> 多种水果并列第一 → 隐藏款</li>
+          </ul>
+          <button type="button" class="btn primary btn-hero-start" id="btn-start">
+            开始测试
+          </button>
+        </div>
       </header>
 
-      <section class="panel hidden" id="view-quiz" aria-live="polite">
-        <div class="quiz-top">
-          <a href="#" class="link-muted" id="link-home-quiz">返回首页</a>
-          <div class="progress">
-            <span id="progress-text">已答 0 / 16</span>
+      <section class="panel quiz-view hidden" id="view-quiz" aria-live="polite">
+        <div class="quiz-hero">
+          <div class="quiz-top">
+            <a href="#" class="link-back" id="link-home-quiz">← 返回首页</a>
+            <span class="quiz-badge">答题中</span>
+          </div>
+          <div class="quiz-progress-row">
+            <span class="progress-label" id="progress-text">已答 0 / 16</span>
+            <div
+              class="quiz-progress-track"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="16"
+              aria-valuenow="0"
+              aria-label="答题进度"
+              id="quiz-progress-bar"
+            >
+              <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+            </div>
           </div>
         </div>
         <p class="quiz-lead">请逐题选择一个最贴近的选项。</p>
         <div class="quiz-all" id="quiz-all"></div>
-        <p class="hint">全选完才能提交并查看结果。</p>
+        <p class="quiz-hint">
+          <span class="quiz-hint-icon" aria-hidden="true">✓</span>
+          全选完才能提交并查看结果。
+        </p>
         <div class="quiz-actions quiz-actions-single">
-          <button type="button" class="btn primary" id="btn-submit" disabled>
+          <button type="button" class="btn primary btn-quiz-submit" id="btn-submit" disabled>
             提交并查看结果
           </button>
         </div>
       </section>
 
       <section class="result-screen hidden" id="view-result">
-        <p class="result-taunt">怎么样，被我拿捏了吧？</p>
+        <p class="result-taunt" id="result-taunt">怎么样，被我拿捏了吧？</p>
+        <p class="result-hidden-banner hidden" id="result-hidden-banner">
+          隐藏款解锁 · 主类型并列
+        </p>
 
-        <div class="card card-hero">
+        <div class="card card-hero" id="result-card-hero">
           <div class="hero-left">
             <p class="hero-label">你的人格类型是：</p>
             <p class="hero-name-cn" id="result-name-cn"></p>

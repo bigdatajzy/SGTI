@@ -8,6 +8,7 @@ import {
   matchPercentFromScores,
   computeDimensionRows,
   countExactHits,
+  HIDDEN_FRUIT,
 } from "../scoring.mjs";
 
 function assertThrows(fn, msg) {
@@ -72,6 +73,18 @@ for (const r of rows) {
 }
 const hits = countExactHits(s0, "stnk");
 assert.ok(hits >= 0 && hits <= 15);
+
+// 隐藏款：两种基础水果并列最高分（例：榴莲 5 · 西瓜 5 · 香蕉 3 · 苹果 3）
+const tieAnswers = [
+  0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1,
+];
+assert.equal(tieAnswers.length, QUESTIONS.length);
+const rTie = computeResult(tieAnswers);
+assert.equal(rTie.isHidden, true);
+assert.equal(rTie.mainId, HIDDEN_FRUIT.id);
+assert.ok(rTie.tiedWith && rTie.tiedWith.length === 2);
+assert.equal(rTie.scores.stnk, 5);
+assert.equal(rTie.scores.meln, 5);
 
 // 匹配度单调性：越极端应倾向更高匹配
 const mpEven = matchPercentFromScores({

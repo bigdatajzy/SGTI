@@ -2,6 +2,7 @@ import {
   QUESTIONS,
   computeResult,
   FRUIT_EMOJI,
+  FRUIT_ART_HTML,
 } from "./scoring.mjs";
 
 const SYS_REMARKS = [
@@ -29,7 +30,9 @@ const views = {
 let answers = [];
 
 function show(view) {
+  document.body.classList.toggle("intro-mode", view === "intro");
   document.body.classList.toggle("result-mode", view === "result");
+  document.body.classList.toggle("quiz-mode", view === "quiz");
   views.intro.classList.toggle("hidden", view !== "intro");
   views.quiz.classList.toggle("hidden", view !== "quiz");
   views.result.classList.toggle("hidden", view !== "result");
@@ -42,8 +45,17 @@ function seedFromAnswers(arr) {
 
 function updateQuizProgress() {
   const n = answers.filter((x) => typeof x === "number").length;
-  el("progress-text").textContent = `已答 ${n} / ${QUESTIONS.length}`;
-  el("btn-submit").disabled = n !== QUESTIONS.length;
+  const total = QUESTIONS.length;
+  const pct = total ? Math.round((n / total) * 100) : 0;
+  el("progress-text").textContent = `已答 ${n} / ${total}`;
+  const fill = el("quiz-progress-fill");
+  if (fill) fill.style.width = `${pct}%`;
+  const bar = el("quiz-progress-bar");
+  if (bar) {
+    bar.setAttribute("aria-valuenow", String(n));
+    bar.setAttribute("aria-valuemax", String(total));
+  }
+  el("btn-submit").disabled = n !== total;
 }
 
 function renderAllQuestions() {
@@ -85,16 +97,47 @@ function renderAllQuestions() {
 
 function renderResult(res) {
   const m = res.main;
+  const hidden = Boolean(res.isHidden);
+  const viewResult = el("view-result");
+  const cardHero = el("result-card-hero");
+  const banner = el("result-hidden-banner");
+  const taunt = el("result-taunt");
+
+  viewResult.classList.toggle("result-screen--hidden", hidden);
+  cardHero.classList.toggle("card-hero--hidden", hidden);
+  banner.classList.toggle("hidden", !hidden);
+
+  if (hidden) {
+    taunt.textContent = "……并列第一？行，给你隐藏款。";
+  } else {
+    taunt.textContent = "怎么样，被我拿捏了吧？";
+  }
+
   el("result-name-cn").textContent = m.name;
   el("result-name-en").textContent = m.code;
-  el("result-emoji").textContent = FRUIT_EMOJI[res.mainId] || "🍊";
+  const artBox = el("result-emoji");
+  const artHtml = FRUIT_ART_HTML[res.mainId];
+  if (artHtml) {
+    artBox.innerHTML = artHtml;
+  } else {
+    artBox.textContent = FRUIT_EMOJI[res.mainId] || "🍊";
+  }
   el("result-quote").textContent = `“${m.tagline || m.blurb.slice(0, 40)}”`;
   el("result-right-title").textContent = `${m.code}（${m.name}）`;
-  el("result-badge").textContent = `匹配度 ${res.match}% · 精准命中 ${res.exactHits}/15 项`;
+
+  if (hidden && res.tiedWith && res.tiedWith.length >= 2) {
+    const names = res.tiedWith.map((x) => `${x.fruit.name}（${x.fruit.code}）`).join(" · ");
+    el("result-badge").textContent = `隐藏款 · 并列 ${res.tiedWith.length} 项 · ${names} · 精准命中 ${res.exactHits}/15 项`;
+  } else {
+    el("result-badge").textContent = `匹配度 ${res.match}% · 精准命中 ${res.exactHits}/15 项`;
+  }
+
   const brief =
     m.blurb.length > 140 ? `${m.blurb.slice(0, 140)}…` : m.blurb;
   el("result-summary").textContent = brief;
-  el("result-sys").textContent = pickRemark(seedFromAnswers(answers));
+  el("result-sys").textContent = hidden
+    ? `系统备注：并列第一的水果：${res.tiedWith.map((x) => x.fruit.name).join("、")}。`
+    : pickRemark(seedFromAnswers(answers));
   el("result-blurb").textContent = m.blurb;
 
   const dimUl = el("result-dimensions");

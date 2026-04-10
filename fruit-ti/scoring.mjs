@@ -67,6 +67,19 @@ export const FRUITS = [
   },
 ];
 
+/**
+ * 隐藏款：当多种基础水果并列最高分时触发，不参与常规计分选项
+ */
+export const HIDDEN_FRUIT = {
+  id: "hybr",
+  name: "隐藏款·双生果",
+  code: "HYBR",
+  tagline:
+    "并列第一：你不是单一口味，而是两种人格在抢麦克风。系统拒绝强行二选一。",
+  blurb:
+    "你的答题结果里，有两种水果同时站在第一名——像双黄蛋、像并蒂、也像「我到底是哪一种」的犹豫本身。隐藏款不是更稀有就更正确，它只是承认：人本来就可以同时像两颗水果。别急着把自己削成一颗；先允许自己分叉。",
+};
+
 export const QUESTIONS = [
   {
     q: "遇到压力时，你的第一反应更接近？",
@@ -215,9 +228,8 @@ export const QUESTIONS = [
 ];
 
 /** 状态标签：每种水果一条短句，风格贴近参考图「状态标签组」 */
-/** 结果页展示用 emoji（榴莲无官方 emoji，用菠萝近似「带刺」） */
+/** 结果页展示用 emoji（Unicode 无榴莲 emoji，榴莲用 SVG，见 FRUIT_ART_HTML） */
 export const FRUIT_EMOJI = {
-  stnk: "🍍",
   meln: "🍉",
   berr: "🍓",
   lemn: "🍋",
@@ -225,6 +237,15 @@ export const FRUIT_EMOJI = {
   appl: "🍎",
   grap: "🍇",
   coco: "🥥",
+  hybr: "✨",
+};
+
+/**
+ * 需用 innerHTML 渲染的水果（榴莲为独立 SVG 文件，便于替换为 Commons 原版）
+ * @see fruit-ti/assets/durian.svg
+ */
+export const FRUIT_ART_HTML = {
+  stnk: `<img src="assets/durian.svg" alt="榴莲" class="fruit-icon-svg durian-icon" width="76" height="76" decoding="async" />`,
 };
 
 export const STATUS_LINES = {
@@ -453,6 +474,7 @@ export function matchPercentFromScores(scores) {
 }
 
 export function fruitById(id) {
+  if (id === HIDDEN_FRUIT.id) return HIDDEN_FRUIT;
   return FRUITS.find((f) => f.id === id) || null;
 }
 
@@ -465,16 +487,65 @@ export function computeResult(answers) {
     if (b.score !== a.score) return b.score - a.score;
     return String(a.id).localeCompare(String(b.id));
   });
-  const mainId = sorted[0].id;
-  const main = fruitById(mainId);
-  if (!main) throw new Error("主类型缺失");
+  const topScore = sorted[0].score;
+  const tiedTop = sorted.filter((x) => x.score === topScore);
+  const isHidden = tiedTop.length >= 2;
+
+  let mainId;
+  let main;
+  let exactHits;
+
+  if (isHidden) {
+    mainId = HIDDEN_FRUIT.id;
+    main = HIDDEN_FRUIT;
+    const refId = tiedTop[0].id;
+    exactHits = countExactHits(scores, refId);
+  } else {
+    mainId = sorted[0].id;
+    main = fruitById(mainId);
+    if (!main) throw new Error("主类型缺失");
+    exactHits = countExactHits(scores, mainId);
+  }
+
   const match = matchPercentFromScores(scores);
-  const top3 = sorted.slice(0, 3).map((x) => ({
-    ...x,
-    fruit: fruitById(x.id),
-    tagLine: STATUS_LINES[x.id],
-  }));
+  const top3 = (() => {
+    if (!isHidden) {
+      return sorted.slice(0, 3).map((x) => ({
+        ...x,
+        fruit: fruitById(x.id),
+        tagLine: STATUS_LINES[x.id],
+      }));
+    }
+    const merged = [...tiedTop];
+    for (const x of sorted) {
+      if (!merged.some((m) => m.id === x.id)) merged.push(x);
+    }
+    return merged.slice(0, 3).map((x) => ({
+      ...x,
+      fruit: fruitById(x.id),
+      tagLine: STATUS_LINES[x.id],
+    }));
+  })();
+
   const dimensionRows = computeDimensionRows(scores);
-  const exactHits = countExactHits(scores, mainId);
-  return { mainId, main, scores, match, top3, sorted, dimensionRows, exactHits };
+  const tiedWith = isHidden
+    ? tiedTop.map((x) => ({
+        id: x.id,
+        score: x.score,
+        fruit: fruitById(x.id),
+      }))
+    : null;
+
+  return {
+    mainId,
+    main,
+    scores,
+    match,
+    top3,
+    sorted,
+    dimensionRows,
+    exactHits,
+    isHidden,
+    tiedWith,
+  };
 }
