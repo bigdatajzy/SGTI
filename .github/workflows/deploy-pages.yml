@@ -34,7 +34,10 @@ jobs:
         run: npm install && npm test
 
       - name: Configure Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
+        with:
+          # 仓库若尚未在 Settings 里开启 Pages，设为 true 会尝试自动启用（避免 Get Pages site / Not Found）
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
