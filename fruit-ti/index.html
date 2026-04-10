@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>水果 TI — 你是什么水果</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero" id="view-intro">
+        <p class="eyebrow">Fruit TI</p>
+        <h1>水果 TI</h1>
+        <p class="lede">MBTI 已经过时，水果 TI 来了。</p>
+        <p class="sub">
+          全选完才会放行。世界已经够乱了，起码把题做完整。
+        </p>
+        <button type="button" class="btn primary" id="btn-start">开始测试</button>
+      </header>
+
+      <section class="panel hidden" id="view-quiz" aria-live="polite">
+        <div class="quiz-top">
+          <a href="#" class="link-muted" id="link-home-quiz">返回首页</a>
+          <div class="progress">
+            <span id="progress-text">已答 0 / 16</span>
+          </div>
+        </div>
+        <p class="quiz-lead">请逐题选择一个最贴近的选项。</p>
+        <div class="quiz-all" id="quiz-all"></div>
+        <p class="hint">全选完才能提交并查看结果。</p>
+        <div class="quiz-actions quiz-actions-single">
+          <button type="button" class="btn primary" id="btn-submit" disabled>
+            提交并查看结果
+          </button>
+        </div>
+      </section>
+
+      <section class="result-screen hidden" id="view-result">
+        <p class="result-taunt">怎么样，被我拿捏了吧？</p>
+
+        <div class="card card-hero">
+          <div class="hero-left">
+            <p class="hero-label">你的人格类型是：</p>
+            <p class="hero-name-cn" id="result-name-cn"></p>
+            <p class="hero-name-en" id="result-name-en"></p>
+            <div class="hero-art" id="result-emoji" aria-hidden="true"></div>
+            <p class="hero-quote" id="result-quote"></p>
+          </div>
+          <div class="hero-right">
+            <p class="hero-right-title" id="result-right-title"></p>
+            <div class="badge-row">
+              <span class="pill" id="result-badge"></span>
+            </div>
+            <p class="hero-summary" id="result-summary"></p>
+            <p class="hero-aside" id="result-sys"></p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">该人格的简单解读</h3>
+          <p class="card-body" id="result-blurb"></p>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">十五维度评分</h3>
+          <ul class="dim-list" id="result-dimensions"></ul>
+        </div>
+
+        <div class="card card-muted">
+          <h3 class="card-title">友情提示</h3>
+          <p class="card-body small">
+            本测试仅供娱乐，别拿它当诊断、面试、相亲、分手、招魂、算命或人生判决书。
+          </p>
+        </div>
+
+        <div class="card card-author">
+          <button
+            type="button"
+            class="author-toggle"
+            id="btn-author-toggle"
+            aria-expanded="false"
+            aria-controls="author-panel"
+          >
+            <span>作者的话</span>
+            <span class="author-chevron" id="author-chevron">展开</span>
+          </button>
+          <div class="author-panel hidden" id="author-panel" hidden>
+            <p>
+              水果 TI 是对「类型叙事」的拙劣模仿：把复杂的人压成一颗水果，当然不公平。若你笑了一下，就够了；若你对号入座了，也允许你明天换一颗。
+            </p>
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button type="button" class="btn outline" id="btn-retry">重新测试</button>
+          <button type="button" class="btn solid-accent" id="btn-home-result">
+            回到首页
+          </button>
+        </div>
+      </section>
+
+      <footer class="foot" id="site-foot">
+        <span>水果 TI · 本地娱乐向人格测试</span>
+      </footer>
+    </div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

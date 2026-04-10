@@ -1,0 +1,8 @@
+{
+  "name": "fruit-ti",
+  "private": true,
+  "scripts": {
+    "test": "node test/scoring.test.mjs",
+    "start": "npx --yes serve -l 5173 ."
+  }
+}
